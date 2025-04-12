@@ -2,12 +2,17 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowRightIcon } from "./ServiceIcons";
-import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 
 export function HomePage() {
-  const navigate = useNavigate();
   const [isHovering, setIsHovering] = useState(false);
+
+  const scrollToServices = () => {
+    const servicesSection = document.getElementById('services-section');
+    if (servicesSection) {
+      servicesSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -33,7 +38,7 @@ export function HomePage() {
               className="bg-wallet-blue hover:bg-blue-600 text-white px-8 py-6 text-lg font-medium rounded-lg transition-all duration-300 flex items-center gap-2 group"
               onMouseEnter={() => setIsHovering(true)}
               onMouseLeave={() => setIsHovering(false)}
-              onClick={() => navigate('/services')}
+              onClick={scrollToServices}
             >
               Connect
               <motion.div

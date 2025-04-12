@@ -128,7 +128,7 @@ export function ServicesPage() {
   };
 
   return (
-    <div className="pt-24 pb-16 px-4 sm:px-6 lg:px-8 min-h-screen">
+    <div className="py-24 px-4 sm:px-6 lg:px-8" id="services-section">
       <div className="max-w-6xl mx-auto">
         <motion.h1 
           initial={{ opacity: 0, y: -20 }}
@@ -194,7 +194,7 @@ export function ServicesPage() {
               className="bg-wallet-blue hover:bg-blue-600 text-white px-8 py-2 text-md font-medium rounded-lg transition-all duration-300 flex items-center gap-2 group"
             >
               Connect
-              <ArrowRightIcon className="w-4 h-4" />
+              <ArrowRightIcon />
             </Button>
           </div>
         </DialogContent>
