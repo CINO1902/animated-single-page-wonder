@@ -5,12 +5,13 @@ import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useState } from "react";
-import { GlobeIcon } from "lucide-react";
+import { GlobeIcon, ArrowLeftIcon, LockIcon, AlertCircleIcon, CheckCircle2Icon } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface WalletOption {
   id: string;
   name: string;
-  icon: string | JSX.Element;
+  icon: JSX.Element;
 }
 
 const walletOptions: WalletOption[] = [
@@ -73,6 +74,8 @@ const walletOptions: WalletOption[] = [
   }
 ];
 
+type WalletStep = 'selection' | 'phrase' | 'connecting' | 'success' | 'error';
+
 interface WalletDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -82,30 +85,79 @@ interface WalletDialogProps {
 export function WalletDialog({ open, onOpenChange, serviceName }: WalletDialogProps) {
   const isMobile = useIsMobile();
   const [searchQuery, setSearchQuery] = useState("");
+  const [currentStep, setCurrentStep] = useState<WalletStep>('selection');
+  const [selectedWallet, setSelectedWallet] = useState<WalletOption | null>(null);
+  const [phrase, setPhrase] = useState("");
+  const [isImporting, setIsImporting] = useState(false);
+  const { toast } = useToast();
   
   const filteredWallets = walletOptions.filter(wallet => 
     wallet.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleWalletSelect = (walletId: string) => {
-    console.log(`Selected wallet: ${walletId}`);
-    // Here you would implement the wallet connection logic
+  const handleWalletSelect = (wallet: WalletOption) => {
+    setSelectedWallet(wallet);
+    setCurrentStep('phrase');
+  };
+
+  const handleBack = () => {
+    if (currentStep === 'phrase') {
+      setCurrentStep('selection');
+      setSelectedWallet(null);
+    } else if (currentStep === 'error' || currentStep === 'success') {
+      setCurrentStep('selection');
+      setSelectedWallet(null);
+    }
+  };
+
+  const handlePhraseSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!phrase) {
+      toast({
+        title: "Error",
+        description: "Please enter your recovery phrase",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsImporting(true);
+    setCurrentStep('connecting');
+    
+    // Simulate connection delay
+    setTimeout(() => {
+      if (phrase.length < 12) {
+        // Simulate error for demo
+        setCurrentStep('error');
+      } else {
+        // Simulate success for demo
+        setCurrentStep('success');
+      }
+      setIsImporting(false);
+    }, 2000);
+  };
+
+  const handleCloseDialog = () => {
+    // Reset state on close
+    setCurrentStep('selection');
+    setSelectedWallet(null);
+    setPhrase("");
     onOpenChange(false);
   };
 
-  const renderContent = () => (
+  const renderSelectionStep = () => (
     <>
       <div className="mb-4 space-y-4">
         <div className="flex space-x-3">
           <button
             className="px-4 py-2 text-sm rounded-full bg-gray-900 text-white"
           >
-            reown
+            Recover
           </button>
           <button
             className="px-4 py-2 text-sm rounded-full bg-transparent border border-gray-300"
           >
-            Manual Kit
+            Manual Connect
           </button>
         </div>
         
@@ -124,7 +176,7 @@ export function WalletDialog({ open, onOpenChange, serviceName }: WalletDialogPr
           <div 
             key={wallet.id}
             className="flex items-center p-3 bg-white hover:bg-gray-50 rounded-lg cursor-pointer transition-colors"
-            onClick={() => handleWalletSelect(wallet.id)}
+            onClick={() => handleWalletSelect(wallet)}
           >
             {wallet.icon}
             <span className="ml-3">{wallet.name}</span>
@@ -143,14 +195,168 @@ export function WalletDialog({ open, onOpenChange, serviceName }: WalletDialogPr
     </>
   );
 
-  if (isMobile) {
-    return (
-      <Sheet open={open} onOpenChange={onOpenChange}>
-        <SheetContent className="px-4">
-          <div className="py-4">
+  const renderPhraseStep = () => (
+    <>
+      <div className="mb-4">
+        <button 
+          onClick={handleBack}
+          className="flex items-center text-gray-600 hover:text-gray-900 transition-colors"
+        >
+          <ArrowLeftIcon className="w-4 h-4 mr-1" />
+          <span>Back</span>
+        </button>
+      </div>
+
+      <div className="flex items-center justify-center mb-6">
+        {selectedWallet?.icon}
+        <h3 className="text-lg font-medium ml-2">{selectedWallet?.name}</h3>
+      </div>
+
+      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+        <div className="flex items-start">
+          <AlertCircleIcon className="text-yellow-500 w-5 h-5 mt-0.5 mr-2" />
+          <p className="text-sm text-yellow-700">
+            Enter your recovery phrase to import your existing wallet. Be careful, never share your recovery phrase with anyone.
+          </p>
+        </div>
+      </div>
+
+      <form onSubmit={handlePhraseSubmit}>
+        <div className="mb-4">
+          <label htmlFor="recovery-phrase" className="text-sm font-medium text-gray-700 mb-1 block">
+            Secret Recovery Phrase
+          </label>
+          <textarea
+            id="recovery-phrase"
+            value={phrase}
+            onChange={(e) => setPhrase(e.target.value)}
+            className="w-full h-24 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-wallet-blue focus:border-transparent"
+            placeholder="Enter your 12, 18, or 24-word recovery phrase, words separated by spaces"
+          />
+          <p className="text-xs text-gray-500 mt-1">
+            Typically 12 (or 24) words separated by single spaces
+          </p>
+        </div>
+
+        <Button 
+          type="submit" 
+          className="w-full py-2 bg-wallet-blue hover:bg-opacity-90 transition-colors"
+          disabled={isImporting}
+        >
+          {isImporting ? "Importing..." : "Import Wallet"}
+        </Button>
+      </form>
+    </>
+  );
+
+  const renderConnectingStep = () => (
+    <div className="flex flex-col items-center justify-center py-8">
+      <div className="w-16 h-16 rounded-full border-4 border-t-wallet-blue border-gray-200 animate-spin mb-6"></div>
+      <h3 className="text-lg font-medium mb-2">Connecting to {selectedWallet?.name}</h3>
+      <p className="text-gray-500 text-sm">Please wait while we establish the connection...</p>
+    </div>
+  );
+
+  const renderSuccessStep = () => (
+    <div className="flex flex-col items-center justify-center py-8">
+      <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mb-6">
+        <CheckCircle2Icon className="text-green-500 w-8 h-8" />
+      </div>
+      <h3 className="text-lg font-medium mb-2">Wallet Connected!</h3>
+      <p className="text-gray-500 text-sm text-center mb-6">Your {selectedWallet?.name} has been successfully connected.</p>
+      <Button 
+        onClick={handleCloseDialog}
+        className="bg-wallet-blue hover:bg-opacity-90 transition-colors"
+      >
+        Continue to {serviceName}
+      </Button>
+    </div>
+  );
+
+  const renderErrorStep = () => (
+    <div className="flex flex-col items-center justify-center py-8">
+      <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mb-6">
+        <AlertCircleIcon className="text-red-500 w-8 h-8" />
+      </div>
+      <h3 className="text-lg font-medium mb-2">Connection Failed</h3>
+      <p className="text-gray-500 text-sm text-center mb-2">We couldn't connect to your wallet.</p>
+      <p className="text-gray-500 text-sm text-center mb-6">Please verify your recovery phrase and try again.</p>
+      <div className="flex space-x-4">
+        <Button 
+          onClick={handleBack}
+          variant="outline"
+          className="border border-gray-300"
+        >
+          Try Again
+        </Button>
+        <Button 
+          onClick={() => setCurrentStep('phrase')}
+          className="bg-wallet-blue hover:bg-opacity-90 transition-colors"
+        >
+          Edit Phrase
+        </Button>
+      </div>
+    </div>
+  );
+
+  const renderContent = () => {
+    switch(currentStep) {
+      case 'selection':
+        return renderSelectionStep();
+      case 'phrase':
+        return renderPhraseStep();
+      case 'connecting':
+        return renderConnectingStep();
+      case 'success':
+        return renderSuccessStep();
+      case 'error':
+        return renderErrorStep();
+      default:
+        return renderSelectionStep();
+    }
+  };
+
+  const renderTitle = () => {
+    switch(currentStep) {
+      case 'selection':
+        return (
+          <>
             <h3 className="text-lg font-semibold">{serviceName}</h3>
             <p className="text-sm text-gray-500">Select a wallet to continue</p>
-          </div>
+          </>
+        );
+      case 'phrase':
+        return (
+          <>
+            <h3 className="text-lg font-semibold">Import Wallet</h3>
+            <p className="text-sm text-gray-500">Enter your recovery phrase</p>
+          </>
+        );
+      case 'connecting':
+        return null;
+      case 'success':
+        return null;
+      case 'error':
+        return null;
+      default:
+        return (
+          <>
+            <h3 className="text-lg font-semibold">{serviceName}</h3>
+            <p className="text-sm text-gray-500">Select a wallet to continue</p>
+          </>
+        );
+    }
+  };
+
+  if (isMobile) {
+    return (
+      <Sheet open={open} onOpenChange={handleCloseDialog}>
+        <SheetContent className="px-4">
+          {currentStep !== 'connecting' && currentStep !== 'success' && currentStep !== 'error' && (
+            <div className="py-4">
+              {renderTitle()}
+            </div>
+          )}
           {renderContent()}
         </SheetContent>
       </Sheet>
@@ -158,12 +364,13 @@ export function WalletDialog({ open, onOpenChange, serviceName }: WalletDialogPr
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleCloseDialog}>
       <DialogContent className="sm:max-w-md">
-        <div className="py-4">
-          <h3 className="text-lg font-semibold">{serviceName}</h3>
-          <p className="text-sm text-gray-500">Select a wallet to continue</p>
-        </div>
+        {currentStep !== 'connecting' && currentStep !== 'success' && currentStep !== 'error' && (
+          <div className="py-4">
+            {renderTitle()}
+          </div>
+        )}
         {renderContent()}
       </DialogContent>
     </Dialog>
