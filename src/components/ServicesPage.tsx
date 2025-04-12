@@ -6,11 +6,7 @@ import {
 } from "./ServiceIcons";
 import { motion } from "framer-motion";
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "./ui/dialog";
-import { Button } from "./ui/button";
-import { Input } from "./ui/input";
-import { Label } from "./ui/label";
-import { ArrowRightIcon } from "./ServiceIcons";
+import { WalletDialog } from "./WalletDialog";
 import { useToast } from "@/hooks/use-toast";
 
 const services = [
@@ -94,7 +90,6 @@ const item = {
 
 export function ServicesPage() {
   const [selectedService, setSelectedService] = useState<string | null>(null);
-  const [walletAddress, setWalletAddress] = useState("");
   const { toast } = useToast();
 
   const handleServiceClick = (title: string) => {
@@ -103,28 +98,6 @@ export function ServicesPage() {
 
   const handleDialogClose = () => {
     setSelectedService(null);
-    setWalletAddress("");
-  };
-
-  const handleConnect = () => {
-    if (!walletAddress || walletAddress.trim().length < 10) {
-      toast({
-        title: "Invalid Address",
-        description: "Please enter a valid wallet address",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    toast({
-      title: "Wallet Connection Initiated",
-      description: `Connecting to ${walletAddress.substring(0, 6)}...${walletAddress.substring(walletAddress.length - 4)}`,
-    });
-    
-    setTimeout(() => {
-      setSelectedService(null);
-      setWalletAddress("");
-    }, 1500);
   };
 
   return (
@@ -167,38 +140,13 @@ export function ServicesPage() {
         </motion.div>
       </div>
 
-      <Dialog open={!!selectedService} onOpenChange={() => handleDialogClose()}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>{selectedService}</DialogTitle>
-            <DialogDescription>
-              Connect your wallet to proceed with {selectedService}
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="flex flex-col gap-4 py-4">
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="wallet">Wallet Address</Label>
-              <Input
-                id="wallet"
-                placeholder="Enter your wallet address"
-                value={walletAddress}
-                onChange={(e) => setWalletAddress(e.target.value)}
-              />
-            </div>
-          </div>
-          
-          <div className="flex justify-end">
-            <Button 
-              onClick={handleConnect}
-              className="bg-wallet-blue hover:bg-blue-600 text-white px-8 py-2 text-md font-medium rounded-lg transition-all duration-300 flex items-center gap-2 group"
-            >
-              Connect
-              <ArrowRightIcon />
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      {selectedService && (
+        <WalletDialog
+          open={!!selectedService}
+          onOpenChange={handleDialogClose}
+          serviceName={selectedService}
+        />
+      )}
     </div>
   );
 }
