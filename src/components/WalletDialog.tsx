@@ -5,7 +5,6 @@ import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useState } from "react";
-import Image from "./Image";
 import { GlobeIcon } from "lucide-react";
 
 interface WalletOption {
@@ -78,11 +77,6 @@ interface WalletDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   serviceName: string;
-}
-
-// Simple Image component since we don't have next/image
-function Image({ src, alt, className }: { src?: string; alt: string; className?: string }) {
-  return <img src={src} alt={alt} className={className} />;
 }
 
 export function WalletDialog({ open, onOpenChange, serviceName }: WalletDialogProps) {
