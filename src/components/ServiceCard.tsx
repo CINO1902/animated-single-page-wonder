@@ -29,7 +29,7 @@ export function ServiceCard({ title, description, icon, className, onClick }: Se
       
       <div className="flex items-center text-wallet-blue text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300">
         <span>Connect wallet</span>
-        <ArrowRightIcon className="ml-1 w-4 h-4" />
+        <ArrowRightIcon className="w-4 h-4 ml-1" />
       </div>
     </div>
   );
