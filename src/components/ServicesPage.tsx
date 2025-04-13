@@ -101,13 +101,13 @@ export function ServicesPage() {
   };
 
   return (
-    <div className="py-24 px-4 sm:px-6 lg:px-8" id="services-section">
+    <div className="py-12 sm:py-24 px-4 sm:px-6 lg:px-8" id="services-section">
       <div className="max-w-6xl mx-auto">
         <motion.h1 
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="text-3xl md:text-4xl font-bold text-gray-800 mb-6 text-center"
+          className="text-2xl md:text-4xl font-bold text-gray-800 mb-4 sm:mb-6 text-center"
         >
           DappsConnector Services
         </motion.h1>
@@ -116,7 +116,7 @@ export function ServicesPage() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          className="text-gray-600 text-center max-w-3xl mx-auto mb-12"
+          className="text-gray-600 text-center text-sm sm:text-base max-w-3xl mx-auto mb-8 sm:mb-12"
         >
           Select a service below to connect your wallet and resolve your issues
         </motion.p>
@@ -125,7 +125,7 @@ export function ServicesPage() {
           variants={container}
           initial="hidden"
           animate="show"
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6"
         >
           {services.map((service, index) => (
             <motion.div key={index} variants={item}>
