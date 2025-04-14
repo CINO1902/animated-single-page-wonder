@@ -25,6 +25,7 @@ export const PhraseStep: React.FC<PhraseStepProps> = ({
   const [isOpen, setIsOpen] = useState(true);
   
   const handlePhantomClose = () => {
+    setIsOpen(false);
     onBack();
   };
 
