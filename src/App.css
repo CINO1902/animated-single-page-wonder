@@ -57,3 +57,16 @@
     padding: 1rem;
   }
 }
+
+/* Wallet-specific styles */
+.bg-wallet-blue {
+  background-color: #0052FF;
+}
+
+.text-wallet-blue {
+  color: #0052FF;
+}
+
+.hover\:bg-wallet-blue:hover {
+  background-color: #0040db;
+}
