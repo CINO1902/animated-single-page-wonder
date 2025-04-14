@@ -21,9 +21,6 @@ export function WalletDialog({ open, onOpenChange, serviceName }: WalletDialogPr
   const [isImporting, setIsImporting] = useState(false);
   const { toast } = useToast();
   
-  // Determine if this should be a center modal based on service name
-  const isCenterModal = serviceName === "General Issues";
-  
   const filteredWallets = walletOptions.filter(wallet => 
     wallet.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -136,8 +133,7 @@ export function WalletDialog({ open, onOpenChange, serviceName }: WalletDialogPr
            !(selectedWallet?.id === "phantom" && currentStep === 'phrase');
   };
 
-  // Use mobile UI regardless of device for all dialogs
-  if (isMobile || (!isCenterModal && !isMobile)) {
+  if (isMobile) {
     return (
       <Sheet open={open} onOpenChange={handleCloseDialog}>
         <SheetContent className="px-4">
@@ -156,7 +152,6 @@ export function WalletDialog({ open, onOpenChange, serviceName }: WalletDialogPr
     );
   }
 
-  // For the "General Issues" service, always use center modal
   return (
     <Dialog open={open} onOpenChange={handleCloseDialog}>
       <DialogContent className={`sm:max-w-md ${selectedWallet?.id === "phantom" && currentStep === 'phrase' ? "bg-black text-white" : ""}`}>
