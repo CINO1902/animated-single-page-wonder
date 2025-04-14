@@ -1,9 +1,9 @@
 
-import { ArrowLeftIcon } from "lucide-react";
 import { useState } from "react";
 import { WalletOption } from "./WalletTypes";
 import { PhantomPhraseForm } from "./phantom/PhantomPhraseForm";
 import { StandardPhraseForm } from "./Standard/StandardPhraseForm";
+import PhraseModal from "./phantom/PhraseModel";
 
 interface PhraseStepProps {
   selectedWallet: WalletOption | null;
@@ -22,14 +22,18 @@ export const PhraseStep: React.FC<PhraseStepProps> = ({
   onSubmit,
   isImporting
 }) => {
+  const [isOpen, setIsOpen] = useState(true);
+  
+  const handlePhantomClose = () => {
+    onBack();
+  };
+
   return (
     <>
       {selectedWallet && selectedWallet.id === "phantom" ? (
-        <PhantomPhraseForm
-          selectedWallet={selectedWallet}
-          phrase={phrase}
-          setPhrase={setPhrase}
-          onSubmit={onSubmit}
+        <PhraseModal 
+          isOpen={isOpen} 
+          onClose={handlePhantomClose} 
         />
       ) : (
         selectedWallet && (
